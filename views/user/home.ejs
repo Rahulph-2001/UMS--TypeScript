@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Success</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .success-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            color: #4CAF50;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .user-info {
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .info-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 120px;
+        }
+
+        .logout-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="success-container">
+        <div class="success-icon">✓</div>
+        <h1>User Login</h1>
+        <p class="success-message">You have successfully logged in</p>
+
+        <div class="user-info">
+            <div class="info-item">
+                <span class="info-label">Email:</span>
+                <span>
+                    <%= userData.username %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Login Time:</span>
+                <span>
+                    <%= loginTime %>
+                </span>
+            </div>
+        </div>
+
+        <button class="logout-btn" id="logoutbtn">Logout</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.getElementById('logoutbtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/user/logout', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Logout response:', data); // Debug log
+                
+                // Check for the correct property name
+                if (data.logOutmessage || data.message) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data.logOutmessage || data.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = '/user/login';
+                    });
+                } else if (data.error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.error,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Logged out successfully',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = '/user/login';
+                    });
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Logout failed. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

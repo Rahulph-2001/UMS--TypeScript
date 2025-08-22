@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .signup-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 450px;
+            max-width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .signup-header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .signup-header h4 {
+            color: #666;
+            font-size: 16px;
+            font-weight: normal;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background-color: #fafbfc;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4c84ff;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(76, 132, 255, 0.1);
+        }
+
+        .form-group input.valid {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+
+        .form-group input.invalid {
+            border-color: #dc3545;
+            background-color: #fff8f8;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            font-size: 18px;
+            user-select: none;
+        }
+
+        .password-toggle:hover {
+            color: #4c84ff;
+        }
+
+        .password-strength {
+            margin-top: 8px;
+        }
+
+        .strength-meter {
+            height: 4px;
+            background: #e1e5e9;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .strength-meter-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .strength-weak { background: #dc3545; width: 25%; }
+        .strength-fair { background: #fd7e14; width: 50%; }
+        .strength-good { background: #ffc107; width: 75%; }
+        .strength-strong { background: #28a745; width: 100%; }
+
+        .strength-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #4c84ff;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .requirement:last-child {
+            margin-bottom: 0;
+        }
+
+        .requirement .check {
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .requirement.met .check {
+            color: #28a745;
+        }
+
+        .requirement.unmet .check {
+            color: #dc3545;
+        }
+
+        .signup-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4c84ff 0%, #3a70e0 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signup-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 132, 255, 0.3);
+        }
+
+        .signup-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .signup-button .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        .signup-button.loading .spinner {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e1e5e9;
+            z-index: 1;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .login-link a {
+            color: #4c84ff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #3a70e0;
+            text-decoration: underline;
+        }
+
+        .terms-text {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 15px;
+            line-height: 1.4;
+        }
+
+        .terms-text a {
+            color: #4c84ff;
+            text-decoration: none;
+        }
+
+        .terms-text a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .signup-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .signup-header h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <h1>Create Account</h1>
+            <h4>Join us today and get started</h4>
+        </div>
+        <form id="signupForm" novalidate>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                <div class="error-message" id="email-error"></div>
+                <div class="success-message" id="email-success"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div style="position: relative;">
+                    <input type="password" id="password" name="password" placeholder="Create a strong password" required>
+                    <span class="password-toggle" id="togglePassword">👁️</span>
+                </div>
+                <div class="password-strength" id="passwordStrength" style="display: none;">
+                    <div class="strength-meter">
+                        <div class="strength-meter-fill" id="strengthMeterFill"></div>
+                    </div>
+                    <div class="strength-text" id="strengthText"></div>
+                </div>
+                <div class="password-requirements" id="passwordRequirements" style="display: none;">
+                    <div class="requirement unmet" id="req-length">
+                        <span class="check">✗</span>
+                        <span>At least 8 characters long</span>
+                    </div>
+                    <div class="requirement unmet" id="req-uppercase">
+                        <span class="check">✗</span>
+                        <span>Contains uppercase letter</span>
+                    </div>
+                    <div class="requirement unmet" id="req-lowercase">
+                        <span class="check">✗</span>
+                        <span>Contains lowercase letter</span>
+                    </div>
+                    <div class="requirement unmet" id="req-number">
+                        <span class="check">✗</span>
+                        <span>Contains at least one number</span>
+                    </div>
+                    <div class="requirement unmet" id="req-special">
+                        <span class="check">✗</span>
+                        <span>Contains special character</span>
+                    </div>
+                </div>
+                <div class="error-message" id="password-error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <div style="position: relative;">
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                    <span class="password-toggle" id="toggleConfirmPassword">👁️</span>
+                </div>
+                <div class="error-message" id="confirm-password-error"></div>
+                <div class="success-message" id="confirm-password-success"></div>
+            </div>
+
+            <button type="submit" class="signup-button" id="signupBtn">
+                <span class="spinner"></span>
+                <span class="button-text">Create Account</span>
+            </button>
+        </form>
+        
+        <div class="terms-text">
+            By creating an account, you agree to our 
+            <a href="/terms">Terms of Service</a> and 
+            <a href="/privacy">Privacy Policy</a>
+        </div>
+        
+        <div class="divider">
+            <span>or</span>
+        </div>
+        <div class="login-link">
+            <p>Already have an account? <a href="/user/login">Sign In</a></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        class SignupValidator {
+            constructor() {
+                this.form = document.getElementById('signupForm');
+                this.emailInput = document.getElementById('email');
+                this.passwordInput = document.getElementById('password');
+                this.confirmPasswordInput = document.getElementById('confirmPassword');
+                this.signupBtn = document.getElementById('signupBtn');
+                
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+              
+                this.emailInput.addEventListener('input', () => this.validateEmail());
+                this.emailInput.addEventListener('blur', () => this.validateEmail());
+                
+                this.passwordInput.addEventListener('input', () => {
+                    this.validatePassword();
+                    this.checkPasswordStrength();
+                    this.validateConfirmPassword(); 
+                });
+                this.passwordInput.addEventListener('focus', () => {
+                    document.getElementById('passwordRequirements').style.display = 'block';
+                });
+                
+                this.confirmPasswordInput.addEventListener('input', () => this.validateConfirmPassword());
+                this.confirmPasswordInput.addEventListener('blur', () => this.validateConfirmPassword());
+                
+               
+                document.getElementById('togglePassword').addEventListener('click', () => 
+                    this.togglePasswordVisibility(this.passwordInput, 'togglePassword'));
+                document.getElementById('toggleConfirmPassword').addEventListener('click', () => 
+                    this.togglePasswordVisibility(this.confirmPasswordInput, 'toggleConfirmPassword'));
+              
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+                
+               
+                this.emailInput.addEventListener('keypress', (e) => {
+                    if (e.key === ' ') e.preventDefault();
+                });
+            }
+
+            validateEmail() {
+                const email = this.emailInput.value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const errorElement = document.getElementById('email-error');
+                const successElement = document.getElementById('email-success');
+
+                if (!email) {
+                    this.showError(this.emailInput, errorElement, successElement, 'Email address is required');
+                    return false;
+                }
+
+                if (!emailRegex.test(email)) {
+                    this.showError(this.emailInput, errorElement, successElement, 'Please enter a valid email address');
+                    return false;
+                }
+
+                if (email.length > 254) {
+                    this.showError(this.emailInput, errorElement, successElement, 'Email address is too long');
+                    return false;
+                }
+
+              
+                const disposableDomains = ['10minutemail.com', 'tempmail.org', 'guerrillamail.com'];
+                const domain = email.split('@')[1];
+                if (disposableDomains.includes(domain)) {
+                    this.showError(this.emailInput, errorElement, successElement, 'Please use a permanent email address');
+                    return false;
+                }
+
+                this.showSuccess(this.emailInput, errorElement, successElement, 'Valid email address');
+                return true;
+            }
+
+            validatePassword() {
+                const password = this.passwordInput.value;
+                const errorElement = document.getElementById('password-error');
+
+                if (!password) {
+                    this.showError(this.passwordInput, errorElement, null, 'Password is required');
+                    return false;
+                }
+
+                if (password.length < 8) {
+                    this.showError(this.passwordInput, errorElement, null, 'Password must be at least 8 characters long');
+                    return false;
+                }
+
+                if (password.length > 128) {
+                    this.showError(this.passwordInput, errorElement, null, 'Password is too long (max 128 characters)');
+                    return false;
+                }
+
+                
+                const hasUppercase = /[A-Z]/.test(password);
+                const hasLowercase = /[a-z]/.test(password);
+                const hasNumbers = /\d/.test(password);
+                const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+                if (!hasUppercase || !hasLowercase || !hasNumbers || !hasSpecialChar) {
+                    this.showError(this.passwordInput, errorElement, null, 'Password must meet all requirements below');
+                    return false;
+                }
+
+              
+                const commonPasswords = ['12345678', 'password', 'Password1', 'qwerty123', 'abc12345'];
+                if (commonPasswords.some(common => password.toLowerCase().includes(common.toLowerCase()))) {
+                    this.showError(this.passwordInput, errorElement, null, 'Please choose a more unique password');
+                    return false;
+                }
+
+                this.showSuccess(this.passwordInput, errorElement, null);
+                return true;
+            }
+
+            checkPasswordStrength() {
+                const password = this.passwordInput.value;
+                const strengthContainer = document.getElementById('passwordStrength');
+                const strengthFill = document.getElementById('strengthMeterFill');
+                const strengthText = document.getElementById('strengthText');
+
+                if (!password) {
+                    strengthContainer.style.display = 'none';
+                    return;
+                }
+
+                strengthContainer.style.display = 'block';
+
+        
+                const requirements = {
+                    length: password.length >= 8,
+                    uppercase: /[A-Z]/.test(password),
+                    lowercase: /[a-z]/.test(password),
+                    number: /\d/.test(password),
+                    special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+                };
+
+               
+                Object.keys(requirements).forEach(req => {
+                    const element = document.getElementById(`req-${req}`);
+                    if (requirements[req]) {
+                        element.classList.remove('unmet');
+                        element.classList.add('met');
+                        element.querySelector('.check').textContent = '✓';
+                    } else {
+                        element.classList.remove('met');
+                        element.classList.add('unmet');
+                        element.querySelector('.check').textContent = '✗';
+                    }
+                });
+
+                
+                let score = 0;
+                Object.values(requirements).forEach(met => met && score++);
+
+               
+                if (password.length >= 12) score += 0.5;
+                if (password.length >= 16) score += 0.5;
+                if (/[!@#$%^&*(),.?":{}|<>].*[!@#$%^&*(),.?":{}|<>]/.test(password)) score += 0.5; 
+
+               
+                if (score < 2) {
+                    strengthFill.className = 'strength-meter-fill strength-weak';
+                    strengthText.textContent = 'Weak';
+                    strengthText.style.color = '#dc3545';
+                } else if (score < 4) {
+                    strengthFill.className = 'strength-meter-fill strength-fair';
+                    strengthText.textContent = 'Fair';
+                    strengthText.style.color = '#fd7e14';
+                } else if (score < 5) {
+                    strengthFill.className = 'strength-meter-fill strength-good';
+                    strengthText.textContent = 'Good';
+                    strengthText.style.color = '#ffc107';
+                } else {
+                    strengthFill.className = 'strength-meter-fill strength-strong';
+                    strengthText.textContent = 'Strong';
+                    strengthText.style.color = '#28a745';
+                }
+            }
+
+            validateConfirmPassword() {
+                const password = this.passwordInput.value;
+                const confirmPassword = this.confirmPasswordInput.value;
+                const errorElement = document.getElementById('confirm-password-error');
+                const successElement = document.getElementById('confirm-password-success');
+
+                if (!confirmPassword) {
+                    this.showError(this.confirmPasswordInput, errorElement, successElement, 'Please confirm your password');
+                    return false;
+                }
+
+                if (password !== confirmPassword) {
+                    this.showError(this.confirmPasswordInput, errorElement, successElement, 'Passwords do not match');
+                    return false;
+                }
+
+                this.showSuccess(this.confirmPasswordInput, errorElement, successElement, 'Passwords match');
+                return true;
+            }
+
+            showError(input, errorElement, successElement, message) {
+                input.classList.remove('valid');
+                input.classList.add('invalid');
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+                if (successElement) {
+                    successElement.classList.remove('show');
+                }
+            }
+
+            showSuccess(input, errorElement, successElement, message = '') {
+                input.classList.remove('invalid');
+                input.classList.add('valid');
+                errorElement.classList.remove('show');
+                if (successElement && message) {
+                    successElement.textContent = message;
+                    successElement.classList.add('show');
+                }
+            }
+
+            togglePasswordVisibility(input, toggleId) {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                document.getElementById(toggleId).textContent = type === 'password' ? '👁️' : '🙈';
+            }
+
+            setLoading(loading) {
+                if (loading) {
+                    this.signupBtn.classList.add('loading');
+                    this.signupBtn.disabled = true;
+                    this.signupBtn.querySelector('.button-text').textContent = 'Creating Account...';
+                } else {
+                    this.signupBtn.classList.remove('loading');
+                    this.signupBtn.disabled = false;
+                    this.signupBtn.querySelector('.button-text').textContent = 'Create Account';
+                }
+            }
+
+            async handleSubmit(e) {
+                e.preventDefault();
+
+               
+                const isEmailValid = this.validateEmail();
+                const isPasswordValid = this.validatePassword();
+                const isConfirmPasswordValid = this.validateConfirmPassword();
+
+                if (!isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
+                    Swal.fire({
+                        title: 'Validation Error',
+                        text: 'Please fix the errors in the form before submitting.',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#4c84ff'
+                    });
+                    return;
+                }
+
+                // Show loading state
+                this.setLoading(true);
+
+                try {
+                    const email = this.emailInput.value.trim().toLowerCase();
+                    const password = this.passwordInput.value;
+                    const confirmPassword = this.confirmPasswordInput.value;
+
+                    const response = await fetch('/user/signup', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password, confirmPassword })
+                    });
+
+                    const data = await response.json();
+                    console.log('Signup response:', data);
+
+                    // Handle specific error messages
+                    if (data.message === 'should enter username and password' ||
+                        data.message === 'user already exist' ||
+                        data.message === 'password is not match' ||
+                        data.error || !response.ok) {
+                        
+                        let errorMessage = data.message || data.error || 'Registration failed';
+                        
+                        // Make error messages more user-friendly
+                        if (errorMessage === 'user already exist') {
+                            errorMessage = 'An account with this email already exists. Please try logging in instead.';
+                        } else if (errorMessage === 'password is not match') {
+                            errorMessage = 'Passwords do not match. Please check and try again.';
+                        } else if (errorMessage === 'should enter username and password') {
+                            errorMessage = 'Please fill in all required fields.';
+                        }
+
+                        Swal.fire({
+                            title: 'Registration Failed',
+                            text: errorMessage,
+                            icon: 'error',
+                            confirmButtonText: 'Try Again',
+                            confirmButtonColor: '#4c84ff'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Welcome!',
+                            text: data.message || 'Account created successfully! Please check your email for verification.',
+                            icon: 'success',
+                            confirmButtonText: 'Continue to Login',
+                            confirmButtonColor: '#4c84ff',
+                            timer: 3000,
+                            timerProgressBar: true
+                        }).then(() => {
+                            window.location.href = data.redirectUrl || '/user/login';
+                        });
+                    }
+
+                } catch (error) {
+                    console.error('Signup error:', error);
+                    Swal.fire({
+                        title: 'Connection Error',
+                        text: 'Unable to connect to the server. Please check your internet connection and try again.',
+                        icon: 'error',
+                        confirmButtonText: 'Retry',
+                        confirmButtonColor: '#4c84ff'
+                    });
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+        }
+
+       
+        document.addEventListener('DOMContentLoaded', () => {
+            new SignupValidator();
+        });
+
+        
+        window.addEventListener('load', () => {
+            const container = document.querySelector('.signup-container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.6s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+
+</html>
